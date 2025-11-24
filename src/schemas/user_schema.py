@@ -1,6 +1,6 @@
 from marshmallow import fields, validate
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, auto_field
-from modelos.users import Usuario
+from src.modelos.users import Usuario
 
 
 class UserSchema(SQLAlchemyAutoSchema):

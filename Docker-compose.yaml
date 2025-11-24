@@ -1,0 +1,28 @@
+
+services:
+  db:
+    image: postgres:16
+    container_name: contact_db
+    env_file: .env 
+    ports: 
+      - "5433:5432" # mapeo 5433 para el host y 5432 dentro del contenedor.
+    volumes:
+      - contacto_db_data:/var/lib/postgresql/data 
+    restart: unless-stopped  
+
+  web:
+    build: .
+    container_name: contacto_api
+    env_file: .env 
+    ports: 
+      - "5000:5000" 
+
+    volumes:
+      - .:/app 
+    restart: unless-stopped  
+
+volumes: 
+  contacto_db_data:  
+
+
+

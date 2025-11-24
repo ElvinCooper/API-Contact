@@ -1,3 +1,12 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*$py.class
+
+
+
 Include/
 Lib/
 Scripts/
@@ -5,3 +14,21 @@ __pycache__/
 *.db
 pyvenv.cfg'.env' 
 .env
+venv/
+
+# Archivos de logs
+*.log
+
+# Configuración de editor
+.vscode/
+.idea/
+
+# Archivos temporales
+*.tmp
+*.swp
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+*.cover

@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, abort, Response
-from extensions import db
-from modelos.contacts import Contacto
-from schemas.contact_schema import ContactoSchema
+from src.extensions import db
+from src.modelos.contacts import Contacto
+from src.schemas.contact_schema import ContactoSchema
 from marshmallow.exceptions import ValidationError
 from flask_jwt_extended import jwt_required
 

@@ -1,7 +1,7 @@
 from sqlalchemy import UniqueConstraint
 from datetime import datetime, timezone
 import uuid
-from extensions import db
+from src.extensions import db
 
 class Contacto(db.Model):
     __tablename__ = 'mis_contactos'

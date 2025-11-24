@@ -1,12 +1,12 @@
 from flask import Blueprint, request, jsonify
-from modelos.users import Usuario
-from schemas.user_schema import UserSchema
+from src.modelos.users import Usuario
+from src.schemas.user_schema import UserSchema
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
-from extensions import db
+from src.extensions import db
 from datetime import timedelta
 from werkzeug.security import check_password_hash, generate_password_hash
 from marshmallow.exceptions import ValidationError
-from utils.mailer import send_simple_email_message
+#from utils.mailer import send_simple_email_message
 
 
 
@@ -20,37 +20,6 @@ usuarios_schema = UserSchema(many=True)
 def create_usuario():
     """
     Registro de usuario
-
-    Este endpoint permite a un usuario registrarse en proveeyendo
-    un username, correo y contraseña.
-    ---
-    tags:
-      - Usuarios
-    parameters:
-      - in: body
-        name: cuerpo
-        required: true
-        schema:
-          id: RegistroUsuario
-          required:
-            - username
-            - password
-            - email
-          properties:
-            username:
-              type: string
-              example: juan123
-            email:
-              type: string
-              example: mario@mail.com  
-            password:
-              type: string
-              example: claveSegura123
-    responses:
-      201:
-        description: Usuario creado correctamente
-      400:
-        description: Faltan campos requeridos o el usuario ya existe
     """ 
     try:
         json_data = request.get_json()
@@ -80,11 +49,11 @@ def create_usuario():
 
 
         # Logica de envio de correo
-        send_simple_email_message(
-            to_email=email,
-           subject='Bienvenido a la api contacto',
-           template_name= 'register'
-       )        
+      #   send_simple_email_message(
+      #       to_email=email,
+      #      subject='Bienvenido a la api contacto',
+      #      template_name= 'register'
+      #  )        
 
         return jsonify(usuario_schema.dump(nuevo_usuario)), 201
     except ValidationError as err:

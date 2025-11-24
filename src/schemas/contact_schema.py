@@ -1,6 +1,6 @@
 from marshmallow import fields, validate
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema, auto_field
-from modelos.contacts import Contacto
+from src.modelos.contacts import Contacto
 
 
 class ContactoSchema(SQLAlchemyAutoSchema):
