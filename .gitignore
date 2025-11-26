@@ -5,3 +5,4 @@ __pycache__/
 *.db
 pyvenv.cfg'.env' 
 .env
+venv/
