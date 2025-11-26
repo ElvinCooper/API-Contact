@@ -1,11 +1,11 @@
 from flask_smorest import Blueprint, abort as smorest_abort
-from flask import jsonify, current_app, response
+from flask import jsonify, current_app, Response
 from src.extensions import db
 from src.modelos.contacts import Contacto
 from src.modelos.users import Usuario
 from src.schemas.contact_schema import ContactoSchema
 from marshmallow.exceptions import ValidationError
-from flask_jwt_extended import jwt_require, create_access_token, create_refresh_token, get_jwt, get_jwt_identity
+from flask_jwt_extended import jwt_required, create_access_token, create_refresh_token, get_jwt, get_jwt_identity
 from flask.views import MethodView 
 import uuid
 from datetime import timezone, datetime
@@ -21,7 +21,7 @@ contacto_bp = Blueprint('contactos', __name__, description='Operaciones con usua
 
 @contacto_bp.route('/usuarios')
 class UsuarioRegister(MethodView):
-  @usuario_bp.response(HTTPStatus.OK, UserSimpleSchema(many=True))
+  #@usuario_bp.response(HTTPStatus.OK, UserSimpleSchema(many=True))
   # @usuario_bp.alt_response(HTTPStatus.UNAUTHORIZED, schema=ErrorSchema, description="No autorizado", example={"succes": False, "message": "No autorizado"})
   #@usuario_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=ErrorSchema, description="Error interno del servidor", example={"succes": False, "message": "Error interno del servidor"})
   #@jwt_required()

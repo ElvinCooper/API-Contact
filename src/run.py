@@ -60,8 +60,8 @@ def create_app(env=None):
         raise ValueError(f"SQLALCHEMY_DATABASE_URI no está configurado para el entorno: {env}")            
     
     # Registro de blueprints    
-    app.register_blueprint(contacto_bp, url_prefix='/api/v1')
-    app.register_blueprint(usuario_bp , url_prefix='/api/v1')
+    api.register_blueprint(contacto_bp, url_prefix='/api/v1')
+    api.register_blueprint(usuario_bp , url_prefix='/api/v1')
     
     @app.route('/', methods=['GET'])
     def home():
