@@ -1,12 +1,12 @@
 from sqlalchemy import UniqueConstraint
 from datetime import datetime, timezone
 import uuid
-from extensions import db
+from src.extensions import db
 
 class Contacto(db.Model):
-    __tablename__ = 'mis_contactos'
+    __tablename__ = 'contactos'
     
-    id             = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    id_contacto             = db.Column(db.String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     nombre         = db.Column(db.String(100), nullable=False)
     email          = db.Column(db.String(120), unique=True, nullable=False)
     telefono       = db.Column(db.String(20))
