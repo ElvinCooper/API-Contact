@@ -1,6 +1,7 @@
 from flask import jsonify
 from flask_smorest import abort as smorest_abort, Blueprint
 from src.modelos.users import Usuario
+from src.modelos.block_list import TokenBlocklist
 from src.schemas.user_schema import UserSchema, UserSimpleSchema, UserErrorSchema, UserRegisterSchema, UserResponseSchema, LogoutResponseSchema, TokenRefreshResponseSchema, UserUpdateSchema
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, create_refresh_token, get_jwt
 from src.extensions import db
@@ -68,7 +69,7 @@ class UserRegisterResource(MethodView):
     @usuario_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=UserErrorSchema, description="Error interno del servidor", example={"success": False, "message": "Error interno del servidor"})
     def post(self, user_data):
       """
-      Registrar nuevo contacto en la base de datos.
+      Registrar nuevo usuario en la base de datos.
 
       Este endpoint permite a un usuario autenticado crear un nuevo contacto
       proporcionando nombre, email y teléfono.
@@ -143,7 +144,7 @@ class UserRegisterResource(MethodView):
           "message": "Login exitoso"
         }          
 
-        # envio de correo 
+        # envio de correo. 
         # send_simple_email_message(
         #       to_email=usuario.email,
         #       subject='Inicio de sesion en la API Contactos',
@@ -171,10 +172,10 @@ class LogoutResource(MethodView):
   @usuario_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=UserErrorSchema, description="Error al generar token", example={"success": False, "message": "Error interno del servidor"})
   def post(self):
         """ Logout usuarios  """
-        # jti =get_jwt()['jti']
-        # db.session.add(TokenBlocklist(jti=jti))
-        # db.session.commit()
-        # return {"mensaje": "Sesion cerrada con exito"}        
+        jti =get_jwt()['jti']
+        db.session.add(TokenBlocklist(jti=jti))
+        db.session.commit()
+        return {"mensaje": "Sesion cerrada con exito"}        
 
 
 # ------------------ Endpoint para renovar los tokens -------------------#
@@ -186,27 +187,27 @@ class RefreshToken(MethodView):
   @usuario_bp.alt_response(HTTPStatus.UNAUTHORIZED, schema=UserErrorSchema, description="No esta autorizado", example={"success": False, "message": "No esta autorizado"})
   @usuario_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=UserErrorSchema, description="Error al generar token", example={"success": False, "message": "Error interno del servidor"})
   def post(self):
-        """ Renovar los tokens """
-        jwt_payload = get_jwt()
-        jti = jwt_payload['jti']
-        identity = get_jwt_identity()
+      """ Renovar los tokens """
+      jwt_payload = get_jwt()
+      jti = jwt_payload['jti']
+      identity = get_jwt_identity()
 
-        # # verificar si el token está revocado
-        # if TokenBlocklist.query.filter_by(jti=jti).first():
-        #     abort(HTTPStatus.UNAUTHORIZED, message="Refresh token revocado")
+      # verificar si el token está revocado
+      if TokenBlocklist.query.filter_by(jti=jti).first():
+          smorest_abort(HTTPStatus.UNAUTHORIZED, message="Refresh token revocado")
 
-        # # Revocar el token actual
-        # db.session.add(TokenBlocklist(jti=jti))
-        # db.session.commit()
+      # Revocar el token actual
+      db.session.add(TokenBlocklist(jti=jti))
+      db.session.commit()
 
-        # Generar nuevos tokens
-        new_access_token = create_access_token(identity=identity)
-        new_refresh_token = create_refresh_token(identity=identity)
+      # Generar nuevos tokens
+      new_access_token = create_access_token(identity=identity)
+      new_refresh_token = create_refresh_token(identity=identity)
 
-        return {
-            "acces_token": new_access_token,
-            "refresh_token": new_refresh_token
-        }
+      return {
+          "acces_token": new_access_token,
+          "refresh_token": new_refresh_token
+      }
         
    
    
@@ -241,4 +242,26 @@ class UsuarioUpdateResource(MethodView):
 
 
 
+@usuario_bp.route('/usuario/delete/<string:id>')
+class ContactoDeleteResource(MethodView):
+  @usuario_bp.arguments(UserUpdateSchema)
+  @usuario_bp.response(HTTPStatus.OK, UserResponseSchema)
+  @usuario_bp.alt_response(HTTPStatus.NOT_FOUND, schema=UserErrorSchema, description="usuario no encontrado", example={"success": False, "message": "No existe un usuario con el Id proveeido"})
+  @usuario_bp.alt_response(HTTPStatus.CONFLICT, schema=UserErrorSchema, description="Ya existe un usuario con ese email", example={"success": False, "message": "Ya existe un usuario con ese email"})
+  @usuario_bp.alt_response(HTTPStatus.UNAUTHORIZED, schema=UserErrorSchema, description="No autorizado", example={"succes": False, "message": "No autorizado"})
+  @usuario_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=UserErrorSchema, description="Error interno del servidor", example={"success": False, "message": "Error interno del servidor"})
+  #@jwt_required()
+  def delete(delete_data):
+      """
+      Eliminar un usuario del sistema.
 
+      Este endpoint permite al usuario autenticado eliminar 
+      a un usuario indicando su id.
+      """    
+      usuario = db.session.get(Usuario, delete_data["id"])
+      if not usuario :
+          smorest_abort(HTTPStatus.NOT_FOUND, description="usuario no encontrado")
+
+      db.session.delete(usuario)
+      db.session.commit()
+      return jsonify({"mensaje": f"Registro '{usuario.user_name}' eliminado exitosamente"}), HTTPStatus.OK    

@@ -9,6 +9,8 @@ import os
 from flask_smorest import Api
 from src.routes.contact_rutes import contacto_bp
 from src.routes.user_rutes import  usuario_bp
+from src.routes.category_rutes import categoria_bp
+from src.routes.pais_rutes import pais_bp
 
 
 
@@ -62,6 +64,8 @@ def create_app(env=None):
     # Registro de blueprints    
     api.register_blueprint(contacto_bp, url_prefix='/api/v1')
     api.register_blueprint(usuario_bp , url_prefix='/api/v1')
+    api.register_blueprint(categoria_bp , url_prefix='/api/v1')
+    api.register_blueprint(pais_bp , url_prefix='/api/v1')
     
     @app.route('/', methods=['GET'])
     def home():

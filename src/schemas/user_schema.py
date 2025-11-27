@@ -40,7 +40,8 @@ class UserRegisterSchema(Schema):
 class UserResponseSchema(Schema):
     id = fields.String()
     user_name = fields.String()
-    email = fields.Email()    
+    email = fields.Email()   
+    telefono = fields.String() 
     
     
 # --------------------- Schema para la respuesta del Logout ---------------------------------------#

@@ -1,8 +1,8 @@
-# import requests, os
-# from flask import render_template
-# from dotenv import load_dotenv
+import requests, os
+from flask import render_template
+from dotenv import load_dotenv
 
-# load_dotenv()
+load_dotenv()
 
 # def send_simple_email_message(to_email, subject, template_name, **template_vars):
 #     domain  = os.getenv("MAILGUN_DOMAIN")
