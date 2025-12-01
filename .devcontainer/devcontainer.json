@@ -3,8 +3,8 @@
   
   // 1. Especifica el archivo docker-compose.yml y el nombre del servicio
   // que representa tu entorno de desarrollo principal (Python).
-  "dockerComposeFile": "../docker-compose.yml",
-  "service": "app", // Reemplaza 'app' con el nombre de tu servicio Python en el YAML
+  "dockerComposeFile": "../Docker-compose.yaml",
+  "service": "run", // Reemplaza 'app' con el nombre de tu servicio Python en el YAML
 
   // 2. Define qué puertos deben reenviarse a tu máquina local.
   // Esto incluye los puertos de tu aplicación y de los servicios de BBDD.
