@@ -4,11 +4,14 @@
   // 1. Especifica el archivo docker-compose.yml y el nombre del servicio
   // que representa tu entorno de desarrollo principal (Python).
   "dockerComposeFile": "../Docker-compose.yaml",
-  "service": "run", // Reemplaza 'app' con el nombre de tu servicio Python en el YAML
+  "service": "web", 
+
+  // 3. Define la ruta de trabajo (debe coincidir con la del volumen)
+  "workspaceFolder": "/app",
 
   // 2. Define qué puertos deben reenviarse a tu máquina local.
   // Esto incluye los puertos de tu aplicación y de los servicios de BBDD.
-  "forwardPorts": [8000, 5000, 5432],
+  "forwardPorts": [5000, 5433],
   
   // 3. Comando a ejecutar después de que los servicios estén levantados
   "postCreateCommand": "pip install --no-cache-dir -r requirements.txt && echo 'Entorno listo!'",
