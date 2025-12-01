@@ -1,5 +1,5 @@
-from modelos.contacts import Contacto 
-from modelos.users import Usuario
+from src.modelos.contacts import Contacto 
+from src.modelos.users import Usuario
 import uuid
 
 def test_usuario_model(db):   

@@ -1,7 +1,7 @@
 import pytest
 from click.testing import CliRunner
-from app import db
-from modelos.users import Usuario
+from src.run import db
+from src.modelos.users import Usuario
 
 @pytest.fixture
 def runner(app):
