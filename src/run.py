@@ -40,34 +40,34 @@ def create_app(env=None):
     # PASO 1: CONFIGURACIÓN DE REDIS PARA RATE LIMITER
     # ----------------------------------------------------
     
-    REDIS_URL = os.environ.get("RATELIMIT_STORAGE_URL")
+    #REDIS_URL = os.environ.get("RATELIMIT_STORAGE_URL")
     
-    if env == "production" and not REDIS_URL:
-        # En producción (Render), el Rate Limiter es obligatorio.
-        raise EnvironmentError("FATAL: RATELIMIT_STORAGE_URL no está configurada. Necesita Upstash Redis en Render.")
+    # if env == "production" and not REDIS_URL:
+    #     # En producción (Render), el Rate Limiter es obligatorio.
+    #     raise EnvironmentError("FATAL: RATELIMIT_STORAGE_URL no está configurada. Necesita Upstash Redis en Render.")
     
-    if REDIS_URL:
-        # Usar Redis para el almacenamiento de límites de velocidad.
-        STORAGE_URI = REDIS_URL
-        print(f"Limiter usará Redis en: {STORAGE_URI.split('@')[-1]}")
-    else:
-        # En desarrollo, si no está configurado, usa la memoria local (solo para pruebas).
-        STORAGE_URI = "memory://"
-        print("ADVERTENCIA: Usando Rate Limiting en memoria (solo para desarrollo).")
+    # if REDIS_URL:
+    #     # Usar Redis para el almacenamiento de límites de velocidad.
+    #     STORAGE_URI = REDIS_URL
+    #     print(f"Limiter usará Redis en: {STORAGE_URI.split('@')[-1]}")
+    # else:
+    #     # En desarrollo, si no está configurado, usa la memoria local (solo para pruebas).
+    #     STORAGE_URI = "memory://"
+    #     print("ADVERTENCIA: Usando Rate Limiting en memoria (solo para desarrollo).")
 
     # ----------------------------------------------------
     # PASO 2: INICIALIZACIÓN DE FLASK-LIMITER
     # ----------------------------------------------------
 
-    limiter = Limiter(
-        storage_uri=STORAGE_URI,
-        # Usar la IP remota para identificar al cliente.
-        key_func=get_remote_address,
-        # Límite predeterminado (se aplicará a todas las rutas que no tengan uno explícito)
-        default_limits=["200 per day", "50 per hour"]
-    )
+    # limiter = Limiter(
+    #     storage_uri=STORAGE_URI,
+    #     # Usar la IP remota para identificar al cliente.
+    #     key_func=get_remote_address,
+    #     # Límite predeterminado (se aplicará a todas las rutas que no tengan uno explícito)
+    #     default_limits=["200 per day", "50 per hour"]
+    # )
     
-    limiter.init_app(app)
+    # limiter.init_app(app)
 
     # Opcional: Personalizar la respuesta 429 "Too Many Requests"
     @app.errorhandler(429)
@@ -131,6 +131,7 @@ app = create_app()
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)
+
 
 
 
