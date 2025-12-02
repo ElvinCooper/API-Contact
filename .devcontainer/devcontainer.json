@@ -3,7 +3,7 @@
   
   // 1. Especifica el archivo docker-compose.yml y el nombre del servicio
   // que representa tu entorno de desarrollo principal (Python).
-  "dockerComposeFile": "../Docker-compose.yaml",
+  "dockerComposeFile": "../docker-compose.yaml",
   "service": "web", 
 
   // 3. Define la ruta de trabajo (debe coincidir con la del volumen)
