@@ -1,0 +1,36 @@
+{
+  "name": "Python con Servicios Docker Compose",
+  
+  // 1. Especifica el archivo docker-compose.yml y el nombre del servicio
+  // que representa tu entorno de desarrollo principal (Python).
+  "dockerComposeFile":  "docker-compose -f docker-compose.yml up -d --build",
+  "service": "web", 
+
+  // 3. Define la ruta de trabajo (debe coincidir con la del volumen)
+  "workspaceFolder": "/app",
+
+  // 2. Define qué puertos deben reenviarse a tu máquina local.
+  // Esto incluye los puertos de tu aplicación y de los servicios de BBDD.
+  "forwardPorts": [5000, 5433],
+  
+  // 3. Comando a ejecutar después de que los servicios estén levantados
+  "postCreateCommand": "pip install --no-cache-dir -r requirements.txt && echo 'Entorno listo!'",
+  
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.testing.pytestEnabled": true
+      },
+      // Extensiones de VS Code
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-azuretools.vscode-docker" // útil para ver los contenedores
+      ]
+    }
+  },
+  
+  // 4. Opcional: Esto ayuda a VS Code a esperar a que los servicios estén listos
+  "initializeCommand": "docker-compose up -d --build"
+}
