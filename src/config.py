@@ -10,7 +10,7 @@ class BaseConfig:
     SQLALCHEMY_TRACK_MODIFICATIONS = False     # Desactiva el seguimiento de modificaciones de objetos para ahorrar recursos
     JWT_SECRET_KEY =  os.getenv("JWT_SECRET_KEY", "default-secret")
     SECRET_KEY = os.getenv("SECRET_KEY", "secret")
-    API_TITLE = "API Contactos"
+    API_TITLE = "ContactManager API"
     API_VERSION = "v1.0.0"
     OPENAPI_VERSION = "3.0.3"
     OPENAPI_URL_PREFIX = "/"
