@@ -131,7 +131,6 @@ class UserRegisterResource(MethodView):
             smorest_abort (HTTPStatus.UNAUTHORIZED, message=f"Credenciales Invalidas password")
               
         # Generar token de authentication
-        #additional_claims = {"rol": usuario.rol}
         access_token = create_access_token(identity=usuario.id)
         refresh_token = create_refresh_token(identity=usuario.id)        
         
@@ -175,6 +174,11 @@ class LogoutResource(MethodView):
   def post(self):
         """ Logout usuarios  """
         jti =get_jwt()['jti']
+
+        # verificar si el token está revocado
+        if TokenBlocklist.query.filter_by(jti=jti).first():
+            return jsonify({"mensaje": "El token ya estaba revocado, sesion confirmada como inactiva."}), HTTPStatus.NO_CONTENT
+
         db.session.add(TokenBlocklist(jti=jti))
         db.session.commit()
         return {"mensaje": "Sesion cerrada con exito"}        
@@ -213,14 +217,14 @@ class RefreshToken(MethodView):
         
    
    
-@usuario_bp.route('/usuario/<id_usuario>')
+@usuario_bp.route('/usuario/<id>')
 class UsuarioUpdateResource(MethodView):
   @usuario_bp.arguments(UserUpdateSchema)
   @usuario_bp.response(HTTPStatus.OK, UserUpdateSchema) 
   @usuario_bp.alt_response(HTTPStatus.NOT_FOUND, schema=UserErrorSchema, description="No existe un usuario con este id", example={"success": False, "message": "Not Found"})
   @usuario_bp.alt_response(HTTPStatus.UNAUTHORIZED, schema=UserErrorSchema, description="No autorizado", example={"success": False, "message": "No autorizado"})
   @usuario_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=UserErrorSchema, description="Error interno del servidor", example={"success": False, "message": "Error interno del servidor"})
-  #@jwt_required()
+  @jwt_required()
   def put(self, update_data, id):
     """ Actualizar datos de un usuario """
     usuario = db.session.get(Usuario, id)
@@ -252,7 +256,7 @@ class ContactoDeleteResource(MethodView):
   @usuario_bp.alt_response(HTTPStatus.CONFLICT, schema=UserErrorSchema, description="Ya existe un usuario con ese email", example={"success": False, "message": "Ya existe un usuario con ese email"})
   @usuario_bp.alt_response(HTTPStatus.UNAUTHORIZED, schema=UserErrorSchema, description="No autorizado", example={"succes": False, "message": "No autorizado"})
   @usuario_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=UserErrorSchema, description="Error interno del servidor", example={"success": False, "message": "Error interno del servidor"})
-  #@jwt_required()
+  @jwt_required()
   def delete(delete_data):
       """
       Eliminar un usuario del sistema.
