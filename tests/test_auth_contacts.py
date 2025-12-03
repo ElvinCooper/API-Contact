@@ -1,7 +1,7 @@
 
 def test_crear_contacto_autenticado(client):
     # 1. Registrar usuario
-    registro_resp = client.post('/api/register', json={
+    registro_resp = client.post('/api/v1/auth/register', json={
         "username": "testuser",
         "password": "testpass",
         "email": "testuser@example.com"

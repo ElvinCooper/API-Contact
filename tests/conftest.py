@@ -23,7 +23,7 @@ def app():
     # Usar variable de entorno del workflow o valor por defecto para Docker local
     test_db_uri = os.getenv(
         'SQLALCHEMY_DATABASE_URI',
-        "postgresql://test-contact:testcontact1234@localhost:5432/test-contact"  # Local Docker
+        "postgresql://test_user:test_password@test-db:5432/test_contact"  # Local Docker
     )
 
     app.config.update({

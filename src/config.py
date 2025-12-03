@@ -59,6 +59,8 @@ class TestingConfig(BaseConfig):
     DEBUG=True
     RATELIMIT_ENABLED = False
     SQLALCHEMY_DATABASE_URI = os.getenv(
-        "TEST_DATABASE_URI", "postgresql://test-contact:testcontact1234@localhost:5432/test-contact")
+        "TEST_DATABASE_URI",
+        "postgresql://test_user:test_password@test-db:5432/test_contact"
+    )
     
     

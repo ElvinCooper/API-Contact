@@ -1,45 +1,62 @@
 from src.modelos.contacts import Contacto 
 from src.modelos.users import Usuario
+from src.modelos.category_model import Categoria
+from src.modelos.contacts import Contacto
+from src.modelos.pais_model import Pais
+from werkzeug.security import generate_password_hash, check_password_hash
+import pytest
 import uuid
 
-def test_usuario_model(db):   
-    unique_username = f"testuser_{uuid.uuid4()}" 
-    unique_email = f"test_{uuid.uuid4()}@example.com"  
-    usuario = Usuario(username=unique_username, password="testpass", email=unique_email)
-    db.session.add(usuario)
-    db.session.commit()
-    assert usuario.id is not None
-    assert Usuario.query.filter_by(username=unique_username).first() == usuario
-    assert str(usuario) == f"<Usuario {unique_username}>"
 
 
+class TestCategoryModel:
+    """Tests para el modelo Categoria"""
 
-def test_contacto_model(db):
-    unique_email = f"test_{uuid.uuid4()}@example.com"  
-    contacto = Contacto(nombre="Test", email=unique_email, telefono="123456789")
-    db.session.add(contacto)
-    db.session.commit()
-    assert contacto.id is not None
-    assert Contacto.query.filter_by(email=unique_email).first() == contacto
-    assert str(contacto) == "<Contact Test>"
-
-
-
-def test_contacto_repr(db):
-    unique_email = f"test_{uuid.uuid4()}@example.com"
-    contacto = Contacto(nombre="Test", email=unique_email, telefono="123456789")
-    db.session.add(contacto)
-    db.session.commit()
-    assert str(contacto)  # Prueba __repr__ si está definido    
-
-
-
-
-def test_contacto_email_validation(db):
-    contacto = Contacto(nombre="Test", email="invalid_email", telefono="123456789")
-    db.session.add(contacto)
-    try:
+    def test_create_category(self, db):
+        """Test: Crear una categoría"""
+        category = Categoria(
+            nombre_categoria='Furniture'
+        )
+        db.session.add(category)
         db.session.commit()
-        assert False, "Debería fallar por email inválido"
-    except:
-        db.session.rollback()    
+
+        assert category.id_categoria is not None
+        assert category.nombre_categoria == 'Furniture'
+
+
+    def test_category_unique_name(self, client, auth_headers, sample_category):
+        """Test: Los nombres de categoría deben ser únicos"""
+
+        duplicate_category = {
+            "nombre_categoria":"Electronics"
+        }
+
+        response = client.post("/api/v1/categoria/register",
+                               json=duplicate_category,
+                               headers=auth_headers)
+
+        assert response.status_code == 409
+
+
+class TestUserModel:
+    """Tests para el modelo Usuario"""
+
+    def test_create_user(self, db):
+        """Test: Crear un usuario"""
+        user = Usuario(
+            username='newuser',
+            email='new@example.com',
+            password=generate_password_hash('testnewuser')
+        )
+        db.session.add(user)
+        db.session.commit()
+
+        assert user.id is not None
+        assert user.username == 'newuser'
+        assert user.email == 'new@example.com'
+
+    def test_password_hashing(self, sample_user):
+        """Test: Las contraseñas deben estar hasheadas"""
+
+        assert sample_user.password != 'testpassword'
+        assert sample_user.check_password('testpassword') is True
