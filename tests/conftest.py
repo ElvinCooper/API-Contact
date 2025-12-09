@@ -8,56 +8,70 @@ from src.modelos.category_model import Categoria
 from src.modelos.pais_model import Pais
 
 
-
-
 @pytest.fixture(scope='session')
 def app():
-    """
-    Crear la aplicacion para testing.
-
-    """
-
+    """Crear la aplicación para testing."""
     os.environ['FLASK_ENV'] = 'testing'
     app = create_app('testing')
 
-    # Usar variable de entorno del workflow o valor por defecto para Docker local
-    test_db_uri = os.getenv(
-        'SQLALCHEMY_DATABASE_URI',
-        "postgresql://test_user:test_password@test-db:5432/test_contact"  # Local Docker
-    )
-
     app.config.update({
         'TESTING': True,
-        'SQLALCHEMY_DATABASE_URI': test_db_uri,  # ← Usar variable
+        'SQLALCHEMY_DATABASE_URI': "postgresql://test_user:test_password@test-db:5432/test_contact",
         'SQLALCHEMY_TRACK_MODIFICATIONS': False,
-        'JWT_SECRET_KEY': 'test-secret-key-do-not-use-in-production',
+        'SQLALCHEMY_ENGINE_OPTIONS': {
+            'pool_pre_ping': True,
+            'pool_recycle': 300,
+            'pool_size': 5,
+            'max_overflow': 0,
+            'connect_args': {
+                'connect_timeout': 10  # Timeout de conexión
+            }
+        },
+        'JWT_SECRET_KEY': 'test-secret-key',
         'WTF_CSRF_ENABLED': False,
         'RATELIMIT_ENABLED': False
     })
 
-    # crear todas las tablas.
-    with app.app_context():
-        _db.create_all()
-        yield app
-        _db.drop_all()
+    # Reintentar si falla la conexión
+    max_retries = 5
+    for attempt in range(max_retries):
+        try:
+            with app.app_context():
+                # Verificar conexión
+                _db.engine.connect()
+                print(f" Conectado a BD en intento {attempt + 1}")
 
-@pytest.fixture(scope='function')
-def db(app):
-    """
-    Proporciona una sesión de base de datos limpia para cada test.
+                _db.drop_all()
+                _db.create_all()
+                print(" Tablas creadas exitosamente")
+                break
+        except OperationalError as e:
+            print(f" Intento {attempt + 1}/{max_retries} falló: {e}")
+            if attempt < max_retries - 1:
+                time.sleep(2)  # Esperar antes de reintentar
+            else:
+                raise
 
-    scope='function': Se ejecuta antes de CADA test individual
-    Esto asegura que cada test comience con una BD vacía
-    """
+    yield app
+
     with app.app_context():
-        # Limpiar todas las tablas antes del test
         _db.session.remove()
         _db.drop_all()
-        _db.create_all()
+        _db.engine.dispose()
+
+
+@pytest.fixture(scope='function', autouse=True)  # autouse: se ejecuta siempre
+def db(app):
+    """Proporciona una sesión limpia para cada test."""
+    with app.app_context():
+        # TRUNCATE es más rápido y no causa deadlocks
+        meta = _db.metadata
+        for table in reversed(meta.sorted_tables):
+            _db.session.execute(_db.text(f'TRUNCATE TABLE {table.name} RESTART IDENTITY CASCADE;'))
+        _db.session.commit()
 
         yield _db
 
-        # Rollback después del test
         _db.session.remove()
 
 

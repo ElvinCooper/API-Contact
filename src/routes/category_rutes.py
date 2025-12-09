@@ -61,21 +61,20 @@ class ContactoRegisterResource(MethodView):
   @categoria_bp.response(HTTPStatus.CREATED, CategoriaResponseSchema)
   @categoria_bp.alt_response(HTTPStatus.CONFLICT, schema=CategoriaErrorSchema, description="Ya existe una categoria con ese nombre", example={"success": False, "message": "Ya existe una categoria con ese nombre"})
   @categoria_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=CategoriaErrorSchema, description="Error interno del servidor", example={"success": False, "message": "Error interno del servidor"})
-  #@jwt_required()
+  @jwt_required()
   def post(self, categoria_data):
       """
       Registrar nueva categoria en la base de datos.
       """
       try:
           if Categoria.query.filter_by(nombre_categoria=categoria_data['nombre_categoria']).first():
-            smorest_abort(HTTPStatus.CONFLICT, message=f"Ya existe un categoria con ese nombre")
+               smorest_abort(HTTPStatus.CONFLICT, message=f"Ya existe un categoria con ese nombre")
                 
-           # Crear el nuevo usuario
-            new_category = Categoria(
-                id_categoria=str(uuid.uuid4()),
-                nombre_categoria=categoria_data['nombre_categoria'],                
-                fecha_creacion=datetime.now(timezone.utc)      
-            )          
+          # Crear el nuevo usuario
+          new_category = Categoria(
+            id_categoria=str(uuid.uuid4()),
+            nombre_categoria=categoria_data['nombre_categoria'],
+            fecha_creacion=datetime.now(timezone.utc) )
 
           db.session.add(new_category)
           db.session.commit()

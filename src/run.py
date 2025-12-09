@@ -18,17 +18,20 @@ from flask_limiter.util import get_remote_address
 
 def create_app(env=None): 
     
-    load_dotenv()    
+    load_dotenv()
 
-    # detectar el entorno desde .FLASKENV
-    env = os.getenv("FLASK_ENV", "DEVELOPMENT")
-    print(f"El entorno es {env}")  # temporal para debug.
+    # Usar el parámetro si existe, sino leer del entorno
+    if env is None:
+        env = os.getenv("FLASK_ENV", "DEVELOPMENT")
+
+    env = env.upper()  # Normalizar a mayúsculas
+    print(f"El entorno es {env}")
     
     app = Flask(__name__)
 
     if env == "DEVELOPMENT":
         app.config.from_object(DevelopmentConfig)
-    elif env == "production":    
+    elif env == "PRODUCTION":
         app.config.from_object(ProductionConfig)
         
     else:
