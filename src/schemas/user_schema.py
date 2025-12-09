@@ -24,14 +24,14 @@ class UserSimpleSchema(Schema):
         schema_name = "UserSimpleSchema"
 
     id_usuario = fields.Str(dump_only=True)
-    user_name = fields.Str()
+    username = fields.Str()
     email = fields.Email()
     
     
 # ------------------------  Schema para registrar un usuario ---------------------------------#
 class UserRegisterSchema(Schema):
 
-    user_name = fields.String(required=True, validate=validate.Length(min=1, max=60))
+    username = fields.String(required=True, validate=validate.Length(min=1, max=60))
     email = fields.Email(required=True)
     password = fields.String(required=True, validate=validate.Length(min=8, max=25), load_only=True)    
     
@@ -39,9 +39,37 @@ class UserRegisterSchema(Schema):
 #------------------------- Schema para respuesta al registrar usuario --------------------------#
 class UserResponseSchema(Schema):
     id = fields.String()
-    user_name = fields.String()
+    username = fields.String()
     email = fields.Email()   
-    telefono = fields.String() 
+    fecha_registro = fields.String()
+    #telefono = fields.String()
+
+
+
+#---------------------------------- Schema para login de usuario ---------------------------------#
+class UserLoginSchema(Schema):
+    class Meta:
+        schema_name = "UserLoginSchema"
+
+    email = fields.Email(required=True)
+    password = fields.String(required=True, validate=validate.Length(min=1))
+
+
+
+
+# ------------------------  Schema para para respuesta de Login exitoso ---------------------------------#
+class LoginResponseSchema(Schema):
+    class Meta:
+        model = Usuario
+        sqla_session = db.session
+        schema_name = "LoginResponseSchema"
+
+    access_token = fields.String()
+    refresh_token = fields.String(required=False)  # Si usas refresh tokens
+    usuario = fields.Nested(UserSchema, only=('id', 'username', 'email'))
+    message = fields.String()
+
+
     
     
 # --------------------- Schema para la respuesta del Logout ---------------------------------------#
@@ -84,7 +112,7 @@ class UserUpdateSchema(Schema):
         # fields = ("user_name", "email")
     
     # Campos que se pueden actualizar
-    user_name = fields.Str(required=False, validate=validate.Length(min=1, max=60))
+    username = fields.Str(required=False, validate=validate.Length(min=1, max=60))
     email = fields.Email(required=False)
     
     

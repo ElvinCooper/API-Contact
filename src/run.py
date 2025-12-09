@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_cors import CORS
 from src.config import DevelopmentConfig, ProductionConfig, TestingConfig
 from src.extensions import db, init_extensions, migrate
@@ -16,58 +16,29 @@ from flask_limiter.util import get_remote_address
 
 
 
-
 def create_app(env=None): 
     
-    load_dotenv()    
+    load_dotenv()
 
-    # detectar el entorno desde .FLASKENV
-    env = os.getenv("FLASK_ENV", "DEVELOPMENT")
-    print(f"El entorno es {env}")  # temporal para debug.
+    # Usar el parámetro si existe, sino leer del entorno
+    if env is None:
+        env = os.getenv("FLASK_ENV", "DEVELOPMENT")
+
+    env = env.upper()  # Normalizar a mayúsculas
+    print(f"El entorno es {env}")
     
     app = Flask(__name__)
 
     if env == "DEVELOPMENT":
         app.config.from_object(DevelopmentConfig)
-    elif env == "production":    
+    elif env == "PRODUCTION":
         app.config.from_object(ProductionConfig)
         
     else:
         app.config.from_object(TestingConfig) 
 
 
-    # ----------------------------------------------------
-    # PASO 1: CONFIGURACIÓN DE REDIS PARA RATE LIMITER
-    # ----------------------------------------------------
-    
-    #REDIS_URL = os.environ.get("RATELIMIT_STORAGE_URL")
-    
-    # if env == "production" and not REDIS_URL:
-    #     # En producción (Render), el Rate Limiter es obligatorio.
-    #     raise EnvironmentError("FATAL: RATELIMIT_STORAGE_URL no está configurada. Necesita Upstash Redis en Render.")
-    
-    # if REDIS_URL:
-    #     # Usar Redis para el almacenamiento de límites de velocidad.
-    #     STORAGE_URI = REDIS_URL
-    #     print(f"Limiter usará Redis en: {STORAGE_URI.split('@')[-1]}")
-    # else:
-    #     # En desarrollo, si no está configurado, usa la memoria local (solo para pruebas).
-    #     STORAGE_URI = "memory://"
-    #     print("ADVERTENCIA: Usando Rate Limiting en memoria (solo para desarrollo).")
 
-    # ----------------------------------------------------
-    # PASO 2: INICIALIZACIÓN DE FLASK-LIMITER
-    # ----------------------------------------------------
-
-    # limiter = Limiter(
-    #     storage_uri=STORAGE_URI,
-    #     # Usar la IP remota para identificar al cliente.
-    #     key_func=get_remote_address,
-    #     # Límite predeterminado (se aplicará a todas las rutas que no tengan uno explícito)
-    #     default_limits=["200 per day", "50 per hour"]
-    # )
-    
-    # limiter.init_app(app)
 
     # Opcional: Personalizar la respuesta 429 "Too Many Requests"
     @app.errorhandler(429)
@@ -76,7 +47,6 @@ def create_app(env=None):
             "error": "Límite de Solicitudes Excedido (429)",
             "message": "Ha enviado demasiadas solicitudes en el tiempo permitido. Intente nuevamente más tarde."
         }), 429
-
 
     # # Inicializar CORS para permitir solicitudes desde el frontend
     # frontend_url = app.config.get('FRONTEND_URL', 'http://localhost:3000')  # Valor por defecto
@@ -110,16 +80,6 @@ def create_app(env=None):
     api.register_blueprint(usuario_bp , url_prefix='/api/v1')
     api.register_blueprint(categoria_bp , url_prefix='/api/v1')
     api.register_blueprint(pais_bp , url_prefix='/api/v1')
-    
-   # ----------------------------------------------------
-    # PASO 3: Ejemplo de Límite en una Ruta.
-    # ----------------------------------------------------
-    
-    
-    @app.route('/', methods=['GET'])
-    @limiter.exempt  # Excluir el home del límite predeterminado.
-    def home():
-        return "<h1> Bienvenido </h1>"
 
 
     return app

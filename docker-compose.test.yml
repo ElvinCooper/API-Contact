@@ -1,0 +1,15 @@
+services:
+  test-db:
+    image: postgres:16
+    container_name: contact_test_db
+    environment:
+      POSTGRES_DB: test_contact
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: test_password
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5434:5432"
+    tmpfs:
+      - /var/lib/postgresql/data  # ✅ BD en memoria, se borra al reiniciar
+    restart: unless-stopped
+    shm_size: 128mb

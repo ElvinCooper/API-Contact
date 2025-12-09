@@ -10,7 +10,7 @@ class BaseConfig:
     SQLALCHEMY_TRACK_MODIFICATIONS = False     # Desactiva el seguimiento de modificaciones de objetos para ahorrar recursos
     JWT_SECRET_KEY =  os.getenv("JWT_SECRET_KEY", "default-secret")
     SECRET_KEY = os.getenv("SECRET_KEY", "secret")
-    API_TITLE = "API Contactos"
+    API_TITLE = "ContactManager API"
     API_VERSION = "v1.0.0"
     OPENAPI_VERSION = "3.0.3"
     OPENAPI_URL_PREFIX = "/"
@@ -59,6 +59,9 @@ class TestingConfig(BaseConfig):
     DEBUG=True
     RATELIMIT_ENABLED = False
     SQLALCHEMY_DATABASE_URI = os.getenv(
-        "TEST_DATABASE_URI", "postgresql://test-contact:testcontact1234@localhost:5432/test-contact")
+        "TEST_DATABASE_URI",
+        #"postgresql://test_user:test_password@test-db:5432/test_contact"
+        "postgresql://test_user:test_password@test-db:5432/test_contact"
+    )
     
     

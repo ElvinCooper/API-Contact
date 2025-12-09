@@ -1,8 +1,9 @@
-from flask import jsonify
+
 from flask_smorest import abort as smorest_abort, Blueprint
 from src.modelos.users import Usuario
 from src.modelos.block_list import TokenBlocklist
-from src.schemas.user_schema import UserSchema, UserSimpleSchema, UserErrorSchema, UserRegisterSchema, UserResponseSchema, LogoutResponseSchema, TokenRefreshResponseSchema, UserUpdateSchema
+from src.schemas.user_schema import (UserSchema, UserSimpleSchema, UserErrorSchema, UserRegisterSchema, UserResponseSchema, LogoutResponseSchema, TokenRefreshResponseSchema,
+                                     UserUpdateSchema, UserLoginSchema, LoginResponseSchema)
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity, create_refresh_token, get_jwt
 from src.extensions import db
 from datetime import timedelta
@@ -13,6 +14,7 @@ from http import HTTPStatus
 from werkzeug.exceptions import HTTPException
 from flask import jsonify, current_app
 import traceback
+import uuid
 
 #from utils.mailer import send_simple_email_message
 
@@ -72,19 +74,19 @@ class UserRegisterResource(MethodView):
       Registrar nuevo usuario en la base de datos.
 
       Este endpoint permite a un usuario autenticado crear un nuevo contacto
-      proporcionando nombre, email y teléfono.
+      proporcionando username, email y password.
       """
       try:
           if Usuario.query.filter_by(email=user_data['email']).first():
             smorest_abort(HTTPStatus.CONFLICT, message=f"Ya existe un usuario con ese email")
                 
-           # Crear el nuevo usuario
-            new_user = Usuario(
-                id_usuario=str(uuid.uuid4()),
-                user_name=data_usuario['user_name'],
-                email=data_usuario['email'],
-                password=generate_password_hash(data_usuario['password'])                
-            )          
+          # Crear el nuevo usuario
+          new_user = Usuario(
+              id=str(uuid.uuid4()),
+              username=user_data['username'],
+              email=user_data['email'],
+              password=generate_password_hash(user_data['password'])
+          )
 
           db.session.add(new_user)
           db.session.commit()
@@ -107,16 +109,16 @@ class UserRegisterResource(MethodView):
 @usuario_bp.route('/auth/login')
 class UserRegisterResource(MethodView):
   #@limiter.limit("5 per minute")  # intentos por minuto
-  @usuario_bp.arguments(UserRegisterSchema)
-  @usuario_bp.response(HTTPStatus.CREATED, UserResponseSchema)
+  @usuario_bp.arguments(UserLoginSchema)
+  @usuario_bp.response(HTTPStatus.CREATED, LoginResponseSchema)
   @usuario_bp.alt_response(HTTPStatus.CONFLICT, schema=UserErrorSchema, description="Ya existe un usuario con ese email", example={"success": False, "message": "Ya existe un usuario con ese email"})
   @usuario_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=UserErrorSchema, description="Error interno del servidor", example={"success": False, "message": "Error interno del servidor"})
   def post(self, data_login):
       """
       Login de usuario
 
-      Este enpoint permite al usuario loguearse para obtener su token
-      y poder acceder a la informacion de los contactos.
+      Este enpoint permite al usuario loguearse con email y password
+      para obtener su token acceder al sistema.
       """
       try:
         # Buscar usuario por email proveeido
@@ -125,20 +127,19 @@ class UserRegisterResource(MethodView):
             current_app.logger.warning(f"Intento de login con email inexistente: {data_login['email']}")
             return({"message":f"Credenciales Invalidas"}), HTTPStatus.UNAUTHORIZED
           
-        if not check_password_hash(usuario.password_hash, data_login.get("password_hash")):        
+        if not check_password_hash(usuario.password, data_login.get("password")):
             smorest_abort (HTTPStatus.UNAUTHORIZED, message=f"Credenciales Invalidas password")
               
         # Generar token de authentication
-        additional_claims = {"rol": usuario.rol}
-        access_token = create_access_token(identity=usuario.id, additional_claims=additional_claims)
+        access_token = create_access_token(identity=usuario.id)
         refresh_token = create_refresh_token(identity=usuario.id)        
         
         response = {
           "access_token": access_token,
           "refresh_token": refresh_token,
           "usuario": {
-              "id_usuario": usuario.id,
-              "nombre": usuario.username,
+              "id": usuario.id,
+              "username": usuario.username,
               "email": usuario.email               
           },
           "message": "Login exitoso"
@@ -173,6 +174,11 @@ class LogoutResource(MethodView):
   def post(self):
         """ Logout usuarios  """
         jti =get_jwt()['jti']
+
+        # verificar si el token está revocado
+        if TokenBlocklist.query.filter_by(jti=jti).first():
+            return jsonify({"mensaje": "El token ya estaba revocado, sesion confirmada como inactiva."}), HTTPStatus.NO_CONTENT
+
         db.session.add(TokenBlocklist(jti=jti))
         db.session.commit()
         return {"mensaje": "Sesion cerrada con exito"}        
@@ -211,14 +217,14 @@ class RefreshToken(MethodView):
         
    
    
-@usuario_bp.route('/usuario/<id_usuario>')
+@usuario_bp.route('/usuario/<id>')
 class UsuarioUpdateResource(MethodView):
   @usuario_bp.arguments(UserUpdateSchema)
   @usuario_bp.response(HTTPStatus.OK, UserUpdateSchema) 
   @usuario_bp.alt_response(HTTPStatus.NOT_FOUND, schema=UserErrorSchema, description="No existe un usuario con este id", example={"success": False, "message": "Not Found"})
   @usuario_bp.alt_response(HTTPStatus.UNAUTHORIZED, schema=UserErrorSchema, description="No autorizado", example={"success": False, "message": "No autorizado"})
   @usuario_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=UserErrorSchema, description="Error interno del servidor", example={"success": False, "message": "Error interno del servidor"})
-  #@jwt_required()
+  @jwt_required()
   def put(self, update_data, id):
     """ Actualizar datos de un usuario """
     usuario = db.session.get(Usuario, id)
@@ -250,7 +256,7 @@ class ContactoDeleteResource(MethodView):
   @usuario_bp.alt_response(HTTPStatus.CONFLICT, schema=UserErrorSchema, description="Ya existe un usuario con ese email", example={"success": False, "message": "Ya existe un usuario con ese email"})
   @usuario_bp.alt_response(HTTPStatus.UNAUTHORIZED, schema=UserErrorSchema, description="No autorizado", example={"succes": False, "message": "No autorizado"})
   @usuario_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=UserErrorSchema, description="Error interno del servidor", example={"success": False, "message": "Error interno del servidor"})
-  #@jwt_required()
+  @jwt_required()
   def delete(delete_data):
       """
       Eliminar un usuario del sistema.
