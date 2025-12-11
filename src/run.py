@@ -3,7 +3,7 @@ from flask_cors import CORS
 from src.config import DevelopmentConfig, ProductionConfig, TestingConfig
 from src.extensions import db, init_extensions, migrate
 from werkzeug.exceptions import HTTPException
-from flask_migrate import Migrate, migrate_upgrade
+from flask_migrate import Migrate, upgrade as migrate_upgrade
 from dotenv import load_dotenv
 import os
 from flask_smorest import Api
