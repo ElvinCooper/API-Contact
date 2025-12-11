@@ -26,10 +26,10 @@ class UsuarioRegister(MethodView):
   @usuario_bp.response(HTTPStatus.OK, UserSimpleSchema(many=True))
   @usuario_bp.alt_response(HTTPStatus.UNAUTHORIZED, schema=UserErrorSchema, description="No autorizado", example={"succes": False, "message": "No autorizado"})
   @usuario_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=UserErrorSchema, description="Error interno del servidor", example={"succes": False, "message": "Error interno del servidor"})
-  #@jwt_required()
+  @jwt_required()
   def get(self):
       """
-      Listar todos los contactos
+      Listar todos los usuarios del sistema
 
       En este endpoint un usuario autenticado puede listar todos
       los contactos existentes en la base de datos.
@@ -46,7 +46,7 @@ class UserResourceId(MethodView):
   @usuario_bp.response(HTTPStatus.OK, UserSimpleSchema)
   @usuario_bp.alt_response(HTTPStatus.NOT_FOUND, schema=UserErrorSchema, description="Usuario no encontrado", example={"succes": False, "message": "Usuario no encontrado"})
   @usuario_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=UserErrorSchema, description="Error interno del servidor", example={"succes": False, "message": "Error interno del servidor"})
-  #@jwt_required()
+  @jwt_required()
   def get(self, id_usuario):
       """
       Obtener contacto por ID
@@ -188,7 +188,7 @@ class LogoutResource(MethodView):
 
 @usuario_bp.route('/auth/refresh')
 class RefreshToken(MethodView):
-  # @jwt_required()
+  @jwt_required()
   @usuario_bp.response(HTTPStatus.OK, TokenRefreshResponseSchema)
   @usuario_bp.alt_response(HTTPStatus.UNAUTHORIZED, schema=UserErrorSchema, description="No esta autorizado", example={"success": False, "message": "No esta autorizado"})
   @usuario_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=UserErrorSchema, description="Error al generar token", example={"success": False, "message": "Error interno del servidor"})

@@ -23,7 +23,7 @@ class ContactosResource(MethodView):
   @contacto_bp.response(HTTPStatus.OK, ContactoSchema(many=True))
   @contacto_bp.alt_response(HTTPStatus.UNAUTHORIZED, schema=ContactoErrorSchema, description="No autorizado", example={"succes": False, "message": "No autorizado"})
   @contacto_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=ContactoErrorSchema, description="Error interno del servidor", example={"succes": False, "message": "Error interno del servidor"})
-  #@jwt_required()
+  @jwt_required()
   def get(self):
       """
       Listar todos los contactos
@@ -44,7 +44,7 @@ class UserResourceId(MethodView):
   @contacto_bp.alt_response(HTTPStatus.NOT_FOUND, schema=ContactoErrorSchema, description="Usuario no encontrado", example={"succes": False, "message": "Usuario no encontrado"})
   @contacto_bp.alt_response(HTTPStatus.UNAUTHORIZED, schema=ContactoErrorSchema, description="No autorizado", example={"succes": False, "message": "No autorizado"})
   @contacto_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=ContactoErrorSchema, description="Error interno del servidor", example={"succes": False, "message": "Error interno del servidor"})
-  #@jwt_required()
+  @jwt_required()
   def get(self, id_contacto):
       """
       Obtener contacto por ID
@@ -79,14 +79,14 @@ class ContactoRegisterResource(MethodView):
           if Usuario.query.filter_by(email=contacto_data['email']).first():
             smorest_abort(HTTPStatus.CONFLICT, message=f"Ya existe un contacto con ese email")
                 
-           # Crear el nuevo usuario
-            new_contacto = Contacto(
-                id_contacto=str(uuid.uuid4()),
-                nombre=data_usuario['nombre'],
-                email=data_usuario['email'],
-                telefono=data_usuario['telefono'],
-                fecha_creacion=datetime.now(timezone.utc)      
-            )          
+          # Crear el nuevo usuario
+          new_contacto = Contacto(
+              id_contacto=str(uuid.uuid4()),
+              nombre=contacto_data['nombre'],
+              email=contacto_data['email'],
+              telefono=contacto_data['telefono'],
+              fecha_creacion=datetime.now(timezone.utc)
+          )
 
           db.session.add(new_contacto)
           db.session.commit()
@@ -112,7 +112,7 @@ class ContactoUpdateResource(MethodView):
   @contacto_bp.alt_response(HTTPStatus.CONFLICT, schema=ContactoErrorSchema, description="Ya existe un contacto con ese email", example={"success": False, "message": "Ya existe un contacto con ese email"})
   @contacto_bp.alt_response(HTTPStatus.UNAUTHORIZED, schema=ContactoErrorSchema, description="No autorizado", example={"succes": False, "message": "No autorizado"})
   @contacto_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=ContactoErrorSchema, description="Error interno del servidor", example={"success": False, "message": "Error interno del servidor"})
-  #@jwt_required() 
+  @jwt_required()
   def put(update_data):
       """
       Actualizar un contacto existente
@@ -154,7 +154,7 @@ class ContactoDeleteResource(MethodView):
   @contacto_bp.alt_response(HTTPStatus.CONFLICT, schema=ContactoErrorSchema, description="Ya existe un contacto con ese email", example={"success": False, "message": "Ya existe un contacto con ese email"})
   @contacto_bp.alt_response(HTTPStatus.UNAUTHORIZED, schema=ContactoErrorSchema, description="No autorizado", example={"succes": False, "message": "No autorizado"})
   @contacto_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=ContactoErrorSchema, description="Error interno del servidor", example={"success": False, "message": "Error interno del servidor"})
-  #@jwt_required()
+  @jwt_required()
   def delete(delete_data):
       """
       Eliminar un contacto
