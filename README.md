@@ -30,79 +30,39 @@ Una API RESTful para la gestión de contactos, desarrollada con **Flask**, **JWT
 - 📨 Envío de correos al registrarse o iniciar sesión (opcional con Mailgun)
 - 🧪 Pruebas automatizadas con **Pytest**
 - 📁 Estructura modular con **Blueprints** y validación con **Marshmallow**
+- 🐳 Contenerización y Despliegue Fácil con Dockerfile y Docker-compose.yaml para entornos de desarrollo instantáneo como Codespaces.
 
 ---
 
 ## 🛠️ Instalación
 
-1. Clona el repositorio:
+1. Clonar el repositorio
+git clone https://github.com/ElvinCooper/API-Contact.git
+cd API-Contact
+2. Crea el archivo .env Este archivo es crucial para la configuración de secretos y la base de datos.
+JWT_SECRET_KEY = tu_clave_secreta_para_jwt
+SECRET_KEY = tu_clave_general
+FLASK_ENV = development
+SQLALCHEMY_DATABASE_URI = sqlite:///mis_contactos.db
+MAILGUN_API_KEY = tu_api_key_mailgun
+MAILGUN_DOMAIN = sandboxXXXX.mailgun.org
+MAILGUN_FROM = Mailgun Sandbox <postmaster@sandboxXXXX.mailgun.org>
+FRONTEND_URL =
+⚠️ Si no usarás correos, puedes dejar los campos vacíos temporalmente.
 
-```bash
-git clone https://github.com/ElvinCooper/-Contact_api.git
-cd -Contact_api
-python -m venv venv
-# En Windows
-venv\Scripts\activate
-# En Linux/macOS
-source venv/bin/activate
-
-### 2. Crea un entorno virtual
-
-```bash
-python -m venv venv
-# Windows
-venv\Scripts\activate
-# Linux/macOS
-source venv/bin/activate
-```
-
-### 3. Instala las dependencias
-
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Crea el archivo `.env`
-
-```env
-JWT_SECRET_KEY=tu_clave_secreta_para_jwt
-SECRET_KEY=tu_clave_general
-FLASK_ENV=development
-SQLALCHEMY_DATABASE_URI=sqlite:///mis_contactos.db
-MAILGUN_API_KEY=tu_api_key_mailgun
-MAILGUN_DOMAIN=sandboxXXXX.mailgun.org
-MAILGUN_FROM=Mailgun Sandbox <postmaster@sandboxXXXX.mailgun.org>
-FRONTEND_URL= 
-```
-
-> ⚠️ Si no usarás correos, puedes dejar los campos vacíos temporalmente.
-
----
-
-## 🗃️ Base de datos
-
-### Iniciar migraciones
-
-```bash
-flask db init
-flask db migrate -m "init"
-flask db upgrade
-```
-
-### Crear la base de datos (opcional para desarrollo o testing):
-
-```bash
-flask db_create
-```
-
----
-
-## ▶️ Ejecutar el servidor
-
-```bash
-flask run --debug  # Esto activa el servidor en modo debuging para desarrllo 
-```
-
+--------------------------------------------------------------------------------
+Opción 1: Despliegue con Docker y Codespaces (Recomendado)
+Utilice esta opción si tiene Docker instalado o si está usando Codespaces, ya que proporciona un entorno de desarrollo consistente, listo para usar, tal como se implementa en Inventario-Docker.
+1. Requisitos Previos: Docker y Docker Compose (o usar Codespaces).
+2. Levantar los servicios:
+3. Verificación: Acceda a la documentación Swagger en la ruta local (http://localhost:5000/apidocs o el puerto configurado).
+Opción 2: Desarrollo Local (Sin Docker)
+Use esta opción si prefiere configurar el entorno Python manualmente.
+1. Crea un entorno virtual:
+2. Instala las dependencias:
+3. Base de datos y Migraciones: Inicie las migraciones de la base de datos:
+4. Ejecutar el servidor:
+5. Esto activará el servidor en modo debugging para desarrollo.
 ---
 
 ## 🔐 Rutas protegidas con JWT
@@ -144,18 +104,22 @@ pytest -v
 ## 🗂 Estructura del proyecto
 
 ```
-/contact_api/
-├── app.py
-├── config.py
-├── extensions.py
-├── /modelos/
-├── /routes/
-├── /schemas/
-├── /templates/
-├── /tests/
-├── migrations/
-├── .env
-└── requirements.txt
+/API-Contact/
+├── .devcontainer/        # Archivos de configuración para Codespaces/Contenedor de Desarrollo
+├── src/                  # DIRECTORIO PRINCIPAL de la lógica de la aplicación
+│   ├── modelos/          # Modelos SQLAlchemy (Contacto, Usuario, Categoria, Pais)
+│   ├── routes/           # Blueprints y rutas
+│   ├── schemas/          # Esquemas de Marshmallow
+│   ├── extensions.py
+│   └── ...
+├── migrations/           # Migraciones de base de datos (Alembic)
+├── templates/ emails/    # Plantillas de correo [2]
+├── tests/                # Pruebas automatizadas con Pytest [2]
+├── Docker-compose.yaml   # Configuración de Docker Compose (API + DB si aplica)
+├── Dockerfile            # Imagen de la aplicación Flask
+├── requirements.txt
+├── requirements-dev.txt  # Nuevas dependencias de desarrollo
+└── README.md
 ```
 
 ---
@@ -190,3 +154,4 @@ Puedes abrir issues o pull requests si deseas proponer mejoras, reportar bugs o 
 
 MIT License
 ```
+
