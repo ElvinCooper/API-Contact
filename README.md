@@ -2,7 +2,16 @@
 
 ![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python)
 ![Flask](https://img.shields.io/badge/Flask-2.x-green?logo=flask)
-![License](https://img.shields.io/github/license/ElvinCooper/-Contact_api)
+[![Postgres](https://img.shields.io/badge/Postgres-%23316192.svg?logo=postgresql&logoColor=white)](#)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=fff)](#)
+[![Pytest](https://img.shields.io/badge/Pytest-fff?logo=pytest&logoColor=000)](#)
+
+[![Swagger](https://img.shields.io/badge/Swagger-85EA2D?logo=swagger&logoColor=173647)](#)
+[![OpenAPI](https://img.shields.io/badge/OpenAPI-6BA539?logo=openapiinitiative&logoColor=white)](#)
+[![PyCharm](https://img.shields.io/badge/PyCharm-000?logo=pycharm&logoColor=fff)](#)
+
+[![LinkedIn](https://custom-icon-badges.demolab.com/badge/LinkedIn-0A66C2?logo=linkedin-white&logoColor=fff)](#)
+
 
 Una API RESTful para la gestión de contactos, desarrollada con **Flask**, **JWT**, **SQLAlchemy**, **Swagger**, **Marshmallow** y más.
 
@@ -154,4 +163,5 @@ Puedes abrir issues o pull requests si deseas proponer mejoras, reportar bugs o 
 
 MIT License
 ```
+
 
