@@ -113,7 +113,7 @@ class ContactoUpdateResource(MethodView):
   @contacto_bp.alt_response(HTTPStatus.UNAUTHORIZED, schema=ContactoErrorSchema, description="No autorizado", example={"succes": False, "message": "No autorizado"})
   @contacto_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=ContactoErrorSchema, description="Error interno del servidor", example={"success": False, "message": "Error interno del servidor"})
   @jwt_required()
-  def put(update_data):
+  def put(self, update_data, id_contacto):
       """
       Actualizar un contacto existente
 
@@ -121,17 +121,18 @@ class ContactoUpdateResource(MethodView):
       de un contacto ya se manera parcial o completa indicando su id.
     
       """    
-      contacto = db.session.get(Contacto, update_data["id_contacto"])
+      contacto = db.session.get(Contacto, id_contacto)
       if not contacto:
         smorest_abort(HTTPStatus.NOT_FOUND, description="Contacto no encontrado")
 
       try:
           
-        if update_data.get("nombre"):
+        if "nombre" in update_data:
           contacto.nombre = update_data["nombre"]
-        if update_data.get("email"):
+        if "email" in update_data:
           contacto.email = update_data["email"]
-        if update_data.get("telefono"):
+        if "telefono" in update_data:
+          contacto.telefono = update_data["telefono"]
           contacto.telefono = update_data["telefono"]
 
         db.session.commit()
@@ -148,21 +149,20 @@ class ContactoUpdateResource(MethodView):
 # ENDPOINT PARA ELIMINAR UN RECURSO DE LA BD
 @contacto_bp.route('/contacto/delete/<string:id_contacto>')
 class ContactoDeleteResource(MethodView):
-  @contacto_bp.arguments(ContactoUpdateSchema)
   @contacto_bp.response(HTTPStatus.OK, ContactoResponseSchema)
   @contacto_bp.alt_response(HTTPStatus.NOT_FOUND, schema=ContactoErrorSchema, description="contacto no encontrado", example={"success": False, "message": "No existe un contacto con el Id proveeido"})
   @contacto_bp.alt_response(HTTPStatus.CONFLICT, schema=ContactoErrorSchema, description="Ya existe un contacto con ese email", example={"success": False, "message": "Ya existe un contacto con ese email"})
   @contacto_bp.alt_response(HTTPStatus.UNAUTHORIZED, schema=ContactoErrorSchema, description="No autorizado", example={"succes": False, "message": "No autorizado"})
   @contacto_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=ContactoErrorSchema, description="Error interno del servidor", example={"success": False, "message": "Error interno del servidor"})
   @jwt_required()
-  def delete(delete_data):
+  def delete(self, id_contacto):
       """
       Eliminar un contacto
 
       Este endpoint permite al usuario autenticado eliminar 
       a un contacto indicando su id.
       """    
-      contacto = db.session.get(Contacto, delete_data["id_contacto"])
+      contacto = db.session.get(Contacto, id_contacto)
       if not contacto :
           smorest_abort(HTTPStatus.NOT_FOUND, description="Contacto no encontrado")
 
