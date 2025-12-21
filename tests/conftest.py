@@ -6,6 +6,8 @@ from src.modelos.users import Usuario
 from src.modelos.contacts import Contacto
 from src.modelos.category_model import Categoria
 from src.modelos.pais_model import Pais
+import time
+import psycopg2
 
 
 @pytest.fixture(scope='session')
@@ -45,7 +47,7 @@ def app():
                 _db.create_all()
                 print(" Tablas creadas exitosamente")
                 break
-        except OperationalError as e:
+        except psycopg2.OperationalError as e:
             print(f" Intento {attempt + 1}/{max_retries} falló: {e}")
             if attempt < max_retries - 1:
                 time.sleep(2)  # Esperar antes de reintentar
