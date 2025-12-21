@@ -15,8 +15,8 @@ jobs:
         image: postgres:15
         env:
           POSTGRES_USER: test_user
-          POSTGRES_PASSWORD: test_pass
-          POSTGRES_DB: test_db
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: test_contact
         ports:
           - 5432:5432
         options: >-
