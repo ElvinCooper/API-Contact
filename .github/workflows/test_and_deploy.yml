@@ -40,7 +40,7 @@ jobs:
 
       - name: Run tests
         env:
-          SQLALCHEMY_DATABASE_URI: postgresql://test_user:test_pass@localhost:5432/test_db
+          SQLALCHEMY_DATABASE_URI: postgresql://test_user:test_password@localhost:5432/test_contact
           JWT_SECRET_KEY: test-secret-key
           SECRET_KEY: test-secret
           FLASK_ENV: testing
