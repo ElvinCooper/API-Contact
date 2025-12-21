@@ -48,9 +48,9 @@ class ProductionConfig(BaseConfig):
     if not SQLALCHEMY_DATABASE_URI:
         raise ValueError("SQLALCHEMY_DATABASE_URI debe estar definido en producción.")
     
-    FRONTEND_URL = os.getenv("FRONTEND_URL")
-    if not FRONTEND_URL:
-        raise ValueError("FRONTEND_URL debe estar definido en producción.")
+    # FRONTEND_URL = os.getenv("FRONTEND_URL")
+    # if not FRONTEND_URL:
+    #     raise ValueError("FRONTEND_URL debe estar definido en producción.")
     
 
 
