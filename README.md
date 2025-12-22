@@ -9,9 +9,9 @@
 
 [![Swagger](https://img.shields.io/badge/Swagger-85EA2D?logo=swagger&logoColor=173647)](#)
 [![OpenAPI](https://img.shields.io/badge/OpenAPI-6BA539?logo=openapiinitiative&logoColor=white)](#)
-[![PyCharm](https://img.shields.io/badge/PyCharm-000?logo=pycharm&logoColor=fff)](#)
+[![PyCharm](https://img.shields.io/badge/PyCharm-000?logo=pycharm&logoColor=fff)](https://www.jetbrains.com/pycharm/)
 
-[![LinkedIn](https://custom-icon-badges.demolab.com/badge/LinkedIn-0A66C2?logo=linkedin-white&logoColor=fff)](#)
+[![LinkedIn](https://custom-icon-badges.demolab.com/badge/LinkedIn-0A66C2?logo=linkedin-white&logoColor=fff)](https://www.linkedin.com/in/elvin-cooper-8a5647b6/)
 
 
 Una API RESTful para la gestión de contactos, desarrollada con **Flask**, **JWT**, **SQLAlchemy**, **Swagger**, **Marshmallow** y más.
@@ -164,6 +164,7 @@ Puedes abrir issues o pull requests si deseas proponer mejoras, reportar bugs o 
 
 MIT License
 ```
+
 
 
 
