@@ -5,6 +5,7 @@
 [![Postgres](https://img.shields.io/badge/Postgres-%23316192.svg?logo=postgresql&logoColor=white)](#)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?logo=docker&logoColor=fff)](#)
 [![Pytest](https://img.shields.io/badge/Pytest-fff?logo=pytest&logoColor=000)](#)
+[![CI Pipeline](https://github.com/ElvinCooper/API-Contact/actions/workflows/test_and_deploy.yml/badge.svg?branch=main)](https://github.com/ElvinCooper/API-Contact/actions/workflows/test_and_deploy.yml)
 
 [![Swagger](https://img.shields.io/badge/Swagger-85EA2D?logo=swagger&logoColor=173647)](#)
 [![OpenAPI](https://img.shields.io/badge/OpenAPI-6BA539?logo=openapiinitiative&logoColor=white)](#)
@@ -163,5 +164,6 @@ Puedes abrir issues o pull requests si deseas proponer mejoras, reportar bugs o 
 
 MIT License
 ```
+
 
 
