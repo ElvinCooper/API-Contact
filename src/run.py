@@ -3,7 +3,7 @@ from flask_cors import CORS
 from src.config import DevelopmentConfig, ProductionConfig, TestingConfig
 from src.extensions import db, init_extensions, migrate
 from werkzeug.exceptions import HTTPException
-from flask_migrate import Migrate
+from flask_migrate import Migrate, upgrade as migrate_upgrade
 from dotenv import load_dotenv
 import os
 from flask_smorest import Api
@@ -39,7 +39,6 @@ def create_app(env=None):
 
 
 
-
     # Opcional: Personalizar la respuesta 429 "Too Many Requests"
     @app.errorhandler(429)
     def ratelimit_handler(e):
@@ -47,6 +46,12 @@ def create_app(env=None):
             "error": "Límite de Solicitudes Excedido (429)",
             "message": "Ha enviado demasiadas solicitudes en el tiempo permitido. Intente nuevamente más tarde."
         }), 429
+
+
+    @app.get("/")
+    def index():
+        return "ContacManager API running"
+
 
     # # Inicializar CORS para permitir solicitudes desde el frontend
     # frontend_url = app.config.get('FRONTEND_URL', 'http://localhost:3000')  # Valor por defecto
@@ -68,7 +73,14 @@ def create_app(env=None):
     
     # codigo para ejecutar migraciones, solo en production  
     #=====================================#
-    
+    if env == "PRODUCTION":
+        with app.app_context():
+            try:
+                print("Ejecutando migraciones automáticas...")
+                migrate_upgrade()
+                print("Migraciones completadas!")
+            except Exception as e:
+                print(f"Error en las migraciones: {e}")
     #=====================================#
     
             

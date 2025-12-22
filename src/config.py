@@ -48,9 +48,9 @@ class ProductionConfig(BaseConfig):
     if not SQLALCHEMY_DATABASE_URI:
         raise ValueError("SQLALCHEMY_DATABASE_URI debe estar definido en producción.")
     
-    FRONTEND_URL = os.getenv("FRONTEND_URL")
-    if not FRONTEND_URL:
-        raise ValueError("FRONTEND_URL debe estar definido en producción.")
+    # FRONTEND_URL = os.getenv("FRONTEND_URL")
+    # if not FRONTEND_URL:
+    #     raise ValueError("FRONTEND_URL debe estar definido en producción.")
     
 
 
@@ -61,7 +61,7 @@ class TestingConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = os.getenv(
         "TEST_DATABASE_URI",
         #"postgresql://test_user:test_password@test-db:5432/test_contact"
-        "postgresql://test_user:test_password@test-db:5432/test_contact"
+        "postgresql://test_user:test_password@localhost:5432/test_contact"
     )
     
     
