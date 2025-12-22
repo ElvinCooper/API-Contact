@@ -40,7 +40,7 @@ class UserResourceId(MethodView):
   @categoria_bp.alt_response(HTTPStatus.NOT_FOUND, schema=CategoriaErrorSchema, description="Categoria no encontrada", example={"succes": False, "message": "Categoria no encontrada"})
   @categoria_bp.alt_response(HTTPStatus.UNAUTHORIZED, schema=CategoriaErrorSchema, description="No autorizado", example={"succes": False, "message": "No autorizado"})
   @categoria_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=CategoriaErrorSchema, description="Error interno del servidor", example={"succes": False, "message": "Error interno del servidor"})
-  #@jwt_required()
+  @jwt_required()
   def get(self, id_categoria):
       """
       Obtener una categoria por su id.      
@@ -102,22 +102,22 @@ class ContactoUpdateResource(MethodView):
   @categoria_bp.alt_response(HTTPStatus.CONFLICT, schema=CategoriaErrorSchema, description="Ya existe una categoria con ese nombre", example={"success": False, "message": "Ya existe una categoria con ese nombre"})
   @categoria_bp.alt_response(HTTPStatus.UNAUTHORIZED, schema=CategoriaErrorSchema, description="No autorizado", example={"succes": False, "message": "No autorizado"})
   @categoria_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=CategoriaErrorSchema, description="Error interno del servidor", example={"success": False, "message": "Error interno del servidor"})
-  #@jwt_required() 
-  def put(update_data):
+  @jwt_required()
+  def put(self, update_data, id_categoria):
       """
       Actualizar una categoria existente     
     
       """    
-      categoria = db.session.get(Categoria, update_data["id_categoria"])
+      categoria = db.session.get(Categoria, id_categoria)
       if not categoria:
-        smorest_abort(HTTPStatus.NOT_FOUND, description="Categoria no encontrado")
+        smorest_abort(HTTPStatus.NOT_FOUND, description="Categoria no encontrada")
 
       try:
-          
         if update_data.get("nombre_categoria"):
-           if update_data["nombre_categoria"] == categoria.nombre_categoria:
-              smorest_abort(HTTPStatus.CONFLICT, message=f"Ya existe una categoria con ese nombre")
-           categoria.nombre_categoria = update_data["nombre_categoria"]
+            if update_data["nombre_categoria"] == categoria.nombre_categoria:
+               smorest_abort(HTTPStatus.CONFLICT, description="Ya existe una categoria con ese nombre")
+            categoria.nombre_categoria = update_data["nombre_categoria"]
+
 
         db.session.commit()      
         return categoria, HTTPStatus.OK
@@ -133,21 +133,20 @@ class ContactoUpdateResource(MethodView):
 
 @categoria_bp.route('/categoria/delete/<string:id_categoria>')
 class ContactoDeleteResource(MethodView):
-  @categoria_bp.arguments(CategoriaUpdateSchema)
   @categoria_bp.response(HTTPStatus.OK, CategoriaResponseSchema)
   @categoria_bp.alt_response(HTTPStatus.NOT_FOUND, schema=CategoriaErrorSchema, description="categoria no encontrada", example={"success": False, "message": "No existe una categoria con el Id proveeido"})
   @categoria_bp.alt_response(HTTPStatus.CONFLICT, schema=CategoriaErrorSchema, description="Ya existe una categoria con ese nombre", example={"success": False, "message": "Ya existe un categoria con ese nombre"})
   @categoria_bp.alt_response(HTTPStatus.UNAUTHORIZED, schema=CategoriaErrorSchema, description="No autorizado", example={"succes": False, "message": "No autorizado"})
   @categoria_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=CategoriaErrorSchema, description="Error interno del servidor", example={"success": False, "message": "Error interno del servidor"})
-  #@jwt_required()
-  def delete(delete_data):
+  @jwt_required()
+  def delete(self, id_categoria):
       """
       Eliminar una categoria existente    
       """    
-      categoria = db.session.get(Categoria, delete_data["id_categoria"])
+      categoria = db.session.get(Categoria, id_categoria)
       if not categoria:
           smorest_abort(HTTPStatus.NOT_FOUND, description="categoria no encontrada")
 
       db.session.delete(categoria)
       db.session.commit()
-      return jsonify({"mensaje": f"Registro '{categoria.nombre_categoria}' eliminado exitosamente"}), HTTPStatus.OK    
+      return HTTPStatus.NO_CONTENT

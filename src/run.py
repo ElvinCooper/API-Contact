@@ -22,7 +22,7 @@ def create_app(env=None):
 
     # Usar el parámetro si existe, sino leer del entorno
     if env is None:
-        env = os.getenv("FLASK_ENV", "DEVELOPMENT")
+        env = os.getenv("FLASK_ENV", "TESTING")
 
     env = env.upper()  # Normalizar a mayúsculas
     print(f"El entorno es {env}")

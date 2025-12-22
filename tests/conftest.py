@@ -137,6 +137,15 @@ def sample_category(db):
     return category
 
 
+@pytest.fixture
+def categoria_id(client, auth_headers):
+    # registrar una nueva categoria
+    create_resp = client.post('/api/v1/categoria/register', json={"nombre_categoria": "categoria example"},
+                              headers=auth_headers)
+    categoria = create_resp.get_json()
+    return categoria["id_categoria"]
+
+
 
 @pytest.fixture
 def sample_pais(db):
@@ -150,6 +159,15 @@ def sample_pais(db):
     db.session.add(pais)
     db.session.commit()
     return pais
+
+
+@pytest.fixture
+def pais_id(client, auth_headers):
+    create_resp = client.post('/api/v1/pais/register', json={"nombre_pais": "pais2 example",
+                                                             "codigo_iso": "DO"},
+                                                       headers=auth_headers)
+    pais = create_resp.get_json()
+    return pais["pais_id"]
 
 
 

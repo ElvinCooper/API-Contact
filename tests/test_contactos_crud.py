@@ -32,13 +32,8 @@ def test_crud_contacto(client, auth_headers):
     contacto = create_resp.get_json()
     contacto_id = contacto["id_contacto"]
 
-    # # Obtener contacto
-    # get_resp = client.get(f'/api/v1/contacto/{contacto_id}', headers=auth_headers)
-    # assert get_resp.status_code == 200
-    # assert get_resp.get_json()["nombre"] == "Contacto Test"
 
     #Actualizar contacto
-    updated_data = {"nombre": "Contacto Actualizado"}
     put_resp = client.put(f'/api/v1/contacto/update/{contacto_id}',
                           json={"nombre": "Contacto Actualizado"},
                           headers=auth_headers)

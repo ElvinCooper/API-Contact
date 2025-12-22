@@ -22,7 +22,7 @@ class CategoriaResource(MethodView):
   @pais_bp.response(HTTPStatus.OK, PaisSchema(many=True))
   @pais_bp.alt_response(HTTPStatus.UNAUTHORIZED, schema=PaisErrorSchema, description="No autorizado", example={"succes": False, "message": "No autorizado"})
   @pais_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=PaisErrorSchema, description="Error interno del servidor", example={"succes": False, "message": "Error interno del servidor"})
-  #@jwt_required()
+  @jwt_required()
   def get(self):
       """
       Listar todas los paises.      
@@ -40,7 +40,7 @@ class UserResourceId(MethodView):
   @pais_bp.alt_response(HTTPStatus.NOT_FOUND, schema=PaisErrorSchema, description="pais no encontrada", example={"succes": False, "message": "pais no encontrado"})
   @pais_bp.alt_response(HTTPStatus.UNAUTHORIZED, schema=PaisErrorSchema, description="No autorizado", example={"succes": False, "message": "No autorizado"})
   @pais_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=PaisErrorSchema, description="Error interno del servidor", example={"succes": False, "message": "Error interno del servidor"})
-  #@jwt_required()
+  @jwt_required()
   def get(self, pais_id):
       """
       Obtener una pais por su id.      
@@ -61,7 +61,7 @@ class PaisRegisterResource(MethodView):
   @pais_bp.response(HTTPStatus.CREATED, PaisResponseSchema)
   @pais_bp.alt_response(HTTPStatus.CONFLICT, schema=PaisErrorSchema, description="Ya existe un pais con ese nombre", example={"success": False, "message": "Ya existe un pais con ese nombre"})
   @pais_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=PaisErrorSchema, description="Error interno del servidor", example={"success": False, "message": "Error interno del servidor"})
-  #@jwt_required()
+  @jwt_required()
   def post(self, pais_data):
       """
       Registrar nuevo pais en la base de datos.
@@ -71,12 +71,12 @@ class PaisRegisterResource(MethodView):
             smorest_abort(HTTPStatus.CONFLICT, message=f"Ya existe un pais con ese nombre")
                 
            # Crear el nuevo usuario
-            new_country = Categoria(
-                pais_id=str(uuid.uuid4()),
-                nombre_pais=pais_data['nombre_pais'],                
-                iso=codigo_iso['codigo_iso'],
-                fecha_creacion=datetime.now(timezone.utc)      
-            )          
+          new_country = Pais(
+              pais_id=str(uuid.uuid4()),
+              nombre_pais=pais_data['nombre_pais'],
+              codigo_iso=pais_data['codigo_iso'],
+              fecha_registro=datetime.now(timezone.utc)
+          )
 
           db.session.add(new_country)
           db.session.commit()
@@ -103,12 +103,12 @@ class PaisUpdateResource(MethodView):
   @pais_bp.alt_response(HTTPStatus.CONFLICT, schema=PaisErrorSchema, description="Ya existe un pais con ese nombre", example={"success": False, "message": "Ya existe un pais con ese nombre"})
   @pais_bp.alt_response(HTTPStatus.UNAUTHORIZED, schema=PaisErrorSchema, description="No autorizado", example={"succes": False, "message": "No autorizado"})
   @pais_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=PaisErrorSchema, description="Error interno del servidor", example={"success": False, "message": "Error interno del servidor"})
-  #@jwt_required() 
-  def put(update_data):
+  @jwt_required()
+  def put(self, update_data, pais_id):
     """
       Actualizar un pais existente         
     """    
-    pais = db.session.get(Pais, update_data["pais_id"])
+    pais = db.session.get(Pais, pais_id)
     if not pais:
         smorest_abort(HTTPStatus.NOT_FOUND, description="pais no encontrado")
 
@@ -136,21 +136,20 @@ class PaisUpdateResource(MethodView):
 
 @pais_bp.route('/pais/delete/<string:pais_id>')
 class ContactoDeleteResource(MethodView):
-  @pais_bp.arguments(PaisUpdateSchema)
-  @pais_bp.response(HTTPStatus.OK, PaisResponseSchema)
+  @pais_bp.response(HTTPStatus.NO_CONTENT, PaisResponseSchema)
   @pais_bp.alt_response(HTTPStatus.NOT_FOUND, schema=PaisErrorSchema, description="pais no encontrado", example={"success": False, "message": "No existe un pais con el Id proveeido"})
   @pais_bp.alt_response(HTTPStatus.CONFLICT, schema=PaisErrorSchema, description="Ya existe un pais con ese nombre", example={"success": False, "message": "Ya existe un pais con ese nombre"})
   @pais_bp.alt_response(HTTPStatus.UNAUTHORIZED, schema=PaisErrorSchema, description="No autorizado", example={"succes": False, "message": "No autorizado"})
   @pais_bp.alt_response(HTTPStatus.INTERNAL_SERVER_ERROR, schema=PaisErrorSchema, description="Error interno del servidor", example={"success": False, "message": "Error interno del servidor"})
-  #@jwt_required()
-  def delete(delete_data):
+  @jwt_required()
+  def delete(self, pais_id):
       """
       Eliminar un pais existente    
       """    
-      pais = db.session.get(Pais, delete_data["pais_id"])
+      pais = db.session.get(Pais, pais_id)
       if not pais:
           smorest_abort(HTTPStatus.NOT_FOUND, description="pais no encontrado")
 
       db.session.delete(pais)
       db.session.commit()
-      return jsonify({"mensaje": f"Registro '{pais.nombre_pais}' eliminado exitosamente"}), HTTPStatus.OK    
+      return HTTPStatus.NO_CONTENT
