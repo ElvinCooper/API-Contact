@@ -123,6 +123,15 @@ def sample_user(db):
     return user
 
 
+@pytest.fixture
+def user_id(client):
+    create_resp = client.post('/api/v1/auth/register', json={"username": "another user",
+                                                             "email": "test@example.com",
+                                                             "password": "test1234"})
+    user = create_resp.get_json()
+    return user["id"]
+
+
 
 @pytest.fixture
 def sample_category(db):

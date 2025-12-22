@@ -57,7 +57,7 @@ class UserResourceId(MethodView):
       if not contacto:
         smorest_abort(HTTPStatus.NOT_FOUND, description="Contacto no encontrado")
             
-      return jsonify(contacto(contacto)), HTTPStatus.OK    
+      return contacto, HTTPStatus.OK
 
 
 
